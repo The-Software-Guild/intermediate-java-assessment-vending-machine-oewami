@@ -1,6 +1,7 @@
 package com.oewami.vendingMachine.dao;
 
 import com.oewami.vendingMachine.dto.Item;
+import com.oewami.vendingMachine.service.PersistenceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +12,18 @@ public class VendingMachineDaoImpl implements VendingMachineDao{
     private Map<String, Item> inventory;
     private String ITEM_FILE = "items.txt";
     private FileDao fileDao;
+    private AuditDao auditDao;
 
     public VendingMachineDaoImpl() {
         this.fileDao = new FileDaoImpl();
         this.inventory = fileDao.readFile(ITEM_FILE);
+        this.auditDao = new AuditDaoImpl();
     }
 
-    public VendingMachineDaoImpl(FileDao fileDao, String file) {
+    public VendingMachineDaoImpl(FileDao fileDao, String file, AuditDao auditDao) {
         this.fileDao = fileDao;
         this.inventory = fileDao.readFile(file);
+        this.auditDao = auditDao;
     }
 
     @Override
@@ -33,21 +37,21 @@ public class VendingMachineDaoImpl implements VendingMachineDao{
     }
 
     @Override
-    public Item addItem(Item item) {
+    public void addItem(Item item) throws PersistenceException {
         inventory.put(item.getName(), item);
-        return item;
+        auditDao.writeAuditEntry("ADDED " + item.getName() + " to inventory");
     }
 
     @Override
-    public Item removeItem(Item item) {
+    public void removeItem(Item item) throws PersistenceException {
         inventory.remove(item.getName());
-        return item;
+        auditDao.writeAuditEntry("DELETED " + item.getName() + " from inventory");
     }
 
     @Override
-    public Item updateInventory(Item item, int count) {
+    public void updateInventory(Item item, int count) throws PersistenceException {
+        auditDao.writeAuditEntry(item.getName() + " count from " + item.getInventory() + " to " + count);
         item.setInventory(count);
-        return item;
     }
 
     public void exit() {

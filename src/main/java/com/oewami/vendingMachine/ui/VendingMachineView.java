@@ -28,16 +28,6 @@ public class VendingMachineView {
         return io.nextBigDecimal("Funds to add: ");
     }
 
-    public void getMoney(Map<Coins, Integer> money) {
-        Set<Coins> coins = money.keySet();
-        BigDecimal sum = new BigDecimal("0.0");
-        for(Coins coin : coins) {
-            io.print(coin + ": " + coin.getValue().multiply(BigDecimal.valueOf(money.get(coin))));
-            sum = sum.add(coin.getValue().multiply(BigDecimal.valueOf(money.get(coin))));
-        }
-        io.print("Total: $" + sum.toString() + "\n");
-    }
-
     public void displayItems(List<Item> inventory) {
         System.out.println(String.format("\n|%-20s|| %7s || %5s", "Product Name", "Cost", "Qty"));
         System.out.println("-".repeat(40));
@@ -69,14 +59,18 @@ public class VendingMachineView {
     }
 
     public void displayChange(Change balance) {
-        Map<Coins, Integer> money = balance.getMoney();
+        Map<Coins, Integer> money = balance.getChange();
         Set<Coins> coins = money.keySet();
         for(Coins coin : coins) {
             io.print(coin + ": " + coin.getValue().multiply(BigDecimal.valueOf(money.get(coin))));
         }
     }
 
-    public void displayRefund(Change balance) {
-        io.print("Refund dispensing: $" + balance.getBalance().negate().toString());
+    public void displayRefund(BigDecimal balance) {
+        io.print("Refund dispensing: $" + balance.negate().toString());
+    }
+
+    public void displayPurchasedItem(Item item) {
+        io.print(item.getName() + " Purchased for " + item.getCost());
     }
 }

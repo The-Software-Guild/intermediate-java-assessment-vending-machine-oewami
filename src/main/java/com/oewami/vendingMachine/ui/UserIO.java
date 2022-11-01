@@ -29,6 +29,13 @@ public class UserIO implements ReadableIO {
         return scanner.nextLine();
     }
 
+    /**
+     * Outputs a message to the console. Takes input from console
+     * and converts the input into a BigDecimal
+     *
+     * @param prompt message displayed to the console
+     * @return User's input as BigDecimal
+     */
     @Override
     public BigDecimal nextBigDecimal(String prompt) {
         System.out.println(prompt);

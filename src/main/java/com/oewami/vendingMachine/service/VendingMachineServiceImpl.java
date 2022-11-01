@@ -11,6 +11,7 @@ import java.util.List;
 public class VendingMachineServiceImpl implements VendingMachineService {
 
     private VendingMachineDao dao;
+    private Change change = new Change();
 
     public VendingMachineServiceImpl() {
         this.dao = new VendingMachineDaoImpl();
@@ -31,47 +32,62 @@ public class VendingMachineServiceImpl implements VendingMachineService {
     }
 
     @Override
-    public Item addItem(Item item) {
+    public void addItem(Item item) throws PersistenceException {
         dao.addItem(item);
-        return null;
     }
 
     @Override
-    public Item removeItem(Item item){
+    public void removeItem(Item item) throws PersistenceException {
         dao.removeItem(item);
-        return null;
     }
 
     @Override
-    public Item changeInventoryCount(Item item, int newCount){
+    public void changeInventoryCount(Item item, int newCount) throws PersistenceException {
         dao.updateInventory(item, newCount);
-        return null;
     }
 
     @Override
-    public BigDecimal sellItem(Change totalFunds, Item item) {//throws InsufficientFundsException, ItemOutOfStockException {
+    public BigDecimal sellItem(Item item) throws PersistenceException {
 //        0 : if value of this BigDecimal is equal to that of BigDecimal object passed as parameter.
 //1 : if value of this BigDecimal is greater than that of BigDecimal object passed as parameter.
 //-1 : if value of this BigDecimal is less than that of BigDecimal object passed as parameter.
-        if(totalFunds.getBalance().compareTo(item.getCost()) >= 0) {
+        if(change.getBalance().compareTo(item.getCost()) >= 0) {
             if(item.getInventory() > 0) {
-                changeInventoryCount(item, item.getInventory() - 1);
-                return totalFunds.adjustBalance(item.getCost());
-
+                dao.updateInventory(item, item.getInventory() - 1);
+                return change.adjustBalance(item.getCost());
             } else {
                 System.out.println(item.getName() + " is OUT OF STOCK");
-                return totalFunds.getBalance();
+                return change.getBalance();
 //                throw new ItemOutOfStockException(item.getName() + " is out of stock");
             }
         } else {
             // display balance of user
             // display how much more money the user needs to buy item.
-            BigDecimal difference = item.getCost().subtract(totalFunds.getBalance());
-            System.out.println("You have: $" + totalFunds.getBalance());
+            BigDecimal difference = item.getCost().subtract(change.getBalance());
+            System.out.println("You have: $" + change.getBalance());
             System.out.println("Needed to Purchase " + item.getName() + ": $" + difference.toString() + "\n");
 //            throw new InsufficientFundsException("DECLINED. Insufficient Funds.");
-            return totalFunds.getBalance();
+            return change.getBalance();
         }
+    }
+
+    @Override
+    public void addFunds(BigDecimal money) {
+        change.addFunds(money);
+    }
+
+    @Override
+    public Change getChange() {
+        return change;
+    }
+
+    public BigDecimal getBalance() {
+        return change.getBalance();
+    }
+
+    @Override
+    public void adjustBalance(BigDecimal cost) {
+        change.adjustBalance(cost);
     }
 
     public void exit() {

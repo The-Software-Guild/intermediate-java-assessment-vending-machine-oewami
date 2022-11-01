@@ -2,10 +2,7 @@ package com.oewami.vendingMachine.controller;
 
 import com.oewami.vendingMachine.dto.Change;
 import com.oewami.vendingMachine.dto.Item;
-import com.oewami.vendingMachine.service.InsufficientFundsException;
-import com.oewami.vendingMachine.service.ItemOutOfStockException;
-import com.oewami.vendingMachine.service.VendingMachineService;
-import com.oewami.vendingMachine.service.VendingMachineServiceImpl;
+import com.oewami.vendingMachine.service.*;
 import com.oewami.vendingMachine.ui.VendingMachineView;
 
 import java.util.List;
@@ -26,28 +23,25 @@ public class VendingMachineController {
         this.service = service;
     }
 
-    public void run() throws ItemOutOfStockException, InsufficientFundsException {
+    public void run() throws InsufficientFundsException, PersistenceException {
         boolean isContinuing = true;
 
 
         while(isContinuing) {
-            view.displayBalance(balance.getBalance());
             String input = view.getMenu();
+            view.displayBalance(balance.getBalance());
 
             switch(input) {
                 case "1":
                     addMoney();
                     break;
                 case "2":
-                    //        io.print("2. Show Items");
                     showItems();
                     break;
                 case"3":
-                    //        io.print("2. Buy Item");
                     buyItem();
                     break;
                 case "4":
-                    //        io.print("3. Exit");
                     isContinuing = false;
                     break;
                 default:
@@ -55,12 +49,13 @@ public class VendingMachineController {
             }
         }
         service.exit();
-        view.displayRefund(balance);
+        view.displayRefund(service.getBalance());
+        service.adjustBalance(service.getBalance());
         view.displayExit();
     }
 
     public void addMoney() {
-        view.getMoney(balance.addFunds(view.addMoney()));
+        service.addFunds(view.addMoney());
     }
 
     public void showItems() {
@@ -68,13 +63,14 @@ public class VendingMachineController {
         view.displayItems(items);
     }
 
-    public void buyItem() throws ItemOutOfStockException, InsufficientFundsException {
+    public void buyItem() throws InsufficientFundsException, PersistenceException {
         view.displayItems(service.listAllItems());
         String input = view.buyItem();
         Item item = service.getItem(input);
         if (item != null) {
-            service.sellItem(balance, item);
-            view.displayChange(balance);
+            service.sellItem(item);
+            view.displayPurchasedItem(item);
+            view.displayChange(service.getChange());
         } else view.displayInvalidInput();
     }
 }

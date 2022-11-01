@@ -11,7 +11,15 @@ import java.util.Map;
 public class FileDaoImpl implements FileDao {
 
     private final String DELIMITER = ",";
-    private final String ITEM_FILE = "items.txt";
+    private final String ITEM_FILE;
+
+    public FileDaoImpl() {
+        ITEM_FILE = "items.txt";
+    }
+
+    public FileDaoImpl(String file) {
+        ITEM_FILE = file;
+    }
 
     @Override
     public Item unmarshallItem(String line) {

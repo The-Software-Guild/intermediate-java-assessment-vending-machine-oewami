@@ -1,8 +1,6 @@
 package com.oewami.vendingMachine.dto;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,14 +8,17 @@ import java.util.Set;
 
 public class Change {
 
-    private Map<Coins, Integer> money;
+    private Map<Coins, Integer> change;
     private int quarters;
     private int dimes;
     private int nickels;
     private int pennies;
 
-    public Change() {
-        this.money = new HashMap<>();
+    public Change() {this.change = new HashMap<>();}
+
+    public Change(BigDecimal funds) {
+        this.change = new HashMap<>();
+        addFunds(funds);
     }
 
     public Map<Coins, Integer> addFunds(BigDecimal funds) {
@@ -34,23 +35,23 @@ public class Change {
         BigDecimal[] fp = fn[1].divideAndRemainder(Coins.PENNY.getValue());
         this.pennies = fp[0].intValue();
 
-        this.money.put(Coins.QUARTER, quarters);
-        this.money.put(Coins.DIME, dimes);
-        this.money.put(Coins.NICKEL, nickels);
-        this.money.put(Coins.PENNY, pennies);
+        this.change.put(Coins.QUARTER, quarters);
+        this.change.put(Coins.DIME, dimes);
+        this.change.put(Coins.NICKEL, nickels);
+        this.change.put(Coins.PENNY, pennies);
 
-        return this.money;
+        return this.change;
     }
 
-    public Map<Coins, Integer> getMoney() {
-        return this.money;
+    public Map<Coins, Integer> getChange() {
+        return this.change;
     }
 
     public BigDecimal getBalance() {
-        Set<Coins> coins = money.keySet();
+        Set<Coins> coins = change.keySet();
         BigDecimal sum = new BigDecimal("0.00");
         for(Coins coin : coins) {
-            sum = sum.add(coin.getValue().multiply(BigDecimal.valueOf(money.get(coin))));
+            sum = sum.add(coin.getValue().multiply(BigDecimal.valueOf(change.get(coin))));
         }
         return sum;
     }
