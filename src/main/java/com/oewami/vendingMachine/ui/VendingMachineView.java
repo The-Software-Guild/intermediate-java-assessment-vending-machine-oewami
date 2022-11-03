@@ -15,6 +15,12 @@ public class VendingMachineView {
 
     public VendingMachineView(UserIO io) { this.io = io; }
 
+    /**
+     * Displays the main menu and asks for the user's choice in
+     * options.
+     *
+     * @return user's choice as string
+     */
     public String getMenu() {
         io.print("\nMENU");
         io.print("1. Add Money");
@@ -24,19 +30,31 @@ public class VendingMachineView {
         return io.nextLine("Choice: ");
     }
 
+    /**
+     * Asks the user for how much money they would like to add
+     * into the machine.
+     *
+     * @return User input as BigDecimal
+     */
     public BigDecimal addMoney() {
         return io.nextBigDecimal("Funds to add: ");
     }
 
+    /**
+     * Display all the items in inventory as a menu.
+     *
+     * @param inventory A list of items to display
+     */
     public void displayItems(List<Item> inventory) {
         System.out.println(String.format("\n|%-20s|| %7s || %5s", "Product Name", "Cost", "Qty"));
         System.out.println("-".repeat(40));
-        for(Item item : inventory) {
-            System.out.println(String.format("|%-20s|| $%6s || %5s",
-                    item.getName(),
-                    item.getCost().toString(),
-                    item.getInventory() > 0 ? item.getInventory() : "Out of Stock"));
-        }
+
+        inventory.stream().forEach(item -> System.out.println(
+                String.format("|%-20s|| $%6s || %5s",
+                        item.getName(),
+                        item.getCost().toString(),
+                        item.getInventory() > 0 ? item.getInventory() : "Out of Stock")));
+
         System.out.println("-".repeat(40));
     }
 

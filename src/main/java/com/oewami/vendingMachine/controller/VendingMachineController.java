@@ -11,7 +11,6 @@ public class VendingMachineController {
 
     private VendingMachineView view;
     private VendingMachineService service;
-    private Change balance = new Change();
 
     public VendingMachineController() {
         this.view = new VendingMachineView();
@@ -29,7 +28,7 @@ public class VendingMachineController {
 
         while(isContinuing) {
             String input = view.getMenu();
-            view.displayBalance(balance.getBalance());
+            view.displayBalance(service.getBalance());
 
             switch(input) {
                 case "1":
